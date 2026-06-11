@@ -1,61 +1,7 @@
-<!-- lineral classifier -->
-<!-- 
-The function: 
-    1. Define the dataset or use the preset dataset
-    2. Define the basic structure of the neural network
-    3. Use the dataset to train the network
-    4. Show classifier's obscure classification edge of the dataset
- 
--->
-<!--
-The progress: [Date] something
-
--->
-<!--
-<br>                换行
-<hr>                水平线
-<p></p>             段落
-<sup></sup>         上标
-<b></b>             加粗
-<i></i>             斜体
-<table>             插入表格 其中有各种各样的属性定义样式，一般推荐三线表
-    <tr>            定义行
-        <td></td>   定义列
-        <td></td>
-    </tr>
-    <tr>
-        ......
-    </tr>
-</table>
-<ol>                定义一个有序列表 order list
-    <li></li>       定义其中的每个条目
-    <li></li>
-</ol>
-<form>                                      定义一个表单，用来获取用户的输入，一般是一些文本框按钮或选项
-    <input type="text" >                    输入文本的框
-    <input type="password">                 输入的文本一般默认展示为隐藏
-    <input type="radio" name="xxx">         单选框 加上name之后用于与JS交互
-    <input type="checkbox">                 复选框
-    <input type="button" value="xx">        定义按钮，value值为按钮上的文字
-
-</form>
-
-<div>...</div>      块级元素 将代码分块
-<span>...</span>    内联元素 作为脚本锚点，用于脚本对这块标签class/id 的处理
-
-元素属性：
-id              元素的唯一表示，不同元素需要不同id
-name            元素的名称，可以相同
-class           元素的类,一个元素可以有若干个类，不同元素可以有相同的类
-style           描述了元素的样式
-CSS:层叠样式表 JSON-like
-
--->
 <html>
     <head>
         <meta charset="UTF-8">
         <title>Neural Network Classifier</title>
-        <!-- 下面的样式设计由AI参考实现 -->
         <style>
             :root {
                 --bg: #f6f7fb;
@@ -246,10 +192,47 @@ CSS:层叠样式表 JSON-like
                 color: var(--muted);
                 font-size: 12px;
             }
+
+            .intro-text {
+                margin: 0;
+                color: var(--text);
+                line-height: 1.7;
+                font-size: 14px;
+            }
+
+            .intro-highlight {
+                display: inline-block;
+                margin-top: 8px;
+                padding: 6px 10px;
+                border-radius: 999px;
+                background: var(--accent-soft);
+                color: #204a93;
+                font-size: 12px;
+                font-weight: 600;
+            }
         </style>
     </head>
     <body>
         <div class="hint">左侧在 1x1 画布中单击可添加数据点；右侧显示多分类神经网络结构。激活函数固定为 tanh。</div>
+        <table>
+            <tr>
+                <td colspan="2">
+                    <div class="panel">
+                        <div class="panel-header">网页简介</div>
+                        <div class="panel-body">
+                            <p class="intro-text">这个页面是一个<b>可交互的神经网络分类器</b>，专门帮助初学者直观理解“神经网络如何学会给数据分类”。你可以把它当成一个实验台：</p>
+                            <ul class="intro-list">
+                                <li><b>左侧画布</b>：代表一个二维平面，横轴和纵轴是两个输入特征（例如 x 和 y）。点击即可放置不同颜色的数据点（红、黄、蓝、绿），每个点代表一个样本及其类别。</li>
+                                <li><b>右侧网络图</b>：展示当前神经网络的连接结构。输入层有 2 个节点（接收坐标），输出层有 4 个节点（分别对应四种颜色），中间是你可以自由调整的<b>隐藏层</b>。</li>
+                                <li><b>训练过程</b>：网络会用 tanh 激活函数和 softmax 输出，反复计算预测与真实标签的差距（交叉熵损失），并通过梯度下降不断更新权重，让背景色块逐渐划分出各类别的“势力范围”。</li>
+                                <li><b>动手实验</b>：改变隐藏层的节点数或层数，再重新训练，观察网络结构如何影响分类能力。</li>
+                            </ul>
+                            <div class="intro-highlight">试试看：先画一些分堆的点，再点击“开始训练”，背景颜色会慢慢分开。你还可以随时停止、修改网络、再训练！</div>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+        </table>
         <table>
             <tr>
                 <td>
@@ -300,7 +283,7 @@ CSS:层叠样式表 JSON-like
                                         <div class="showcase">训练细节</div>
                                         <div class="showcase">模式：<span id="train-mode">空闲</span></div>
                                         <div class="showcase">数据集循环次数：<span id="train-epoch">0</span></div>
-                                        <div class="showcase">误差(Loss)：<span id="train-loss">-</span></div>
+                                        <div class="showcase">误差(Loss): <span id="train-loss">-</span></div>
                                         <div class="showcase">最后动作：<span id="last-action">无</span></div>
                                     </div>
                                 </div>
@@ -317,8 +300,8 @@ CSS:层叠样式表 JSON-like
                         <div class="panel-header">神经网络修改</div>
                         <div class="panel-body">
                             <form id="network-form">
-                                <div id="current-col" class="showcase">当前列： <span id="current-col-num">1</span></div>
-                                <div id="node" class="showcase">当前列的节点数： <span id="current-node-num">4</span></div>
+                                <div id="current-col" class="showcase">当前列: <span id="current-col-num">1</span></div>
+                                <div id="node" class="showcase">当前列的节点数: <span id="current-node-num">4</span></div>
                                 <div class="showcase">输出层固定为 4 个节点，对应红黄蓝绿四类。</div>
                                 <div class="actions">
                                     <input type="button" value="添加节点" id="add-node">
@@ -648,6 +631,10 @@ CSS:层叠样式表 JSON-like
                     return `rgba(220, 38, 38, ${alpha})`;
                 }
 
+                function neutralStrokeColor() {
+                    return 'rgba(148, 163, 184, 0.55)';
+                }
+
                 function renderNetwork() {
                     const width = 640;
                     const height = 500;
@@ -690,25 +677,28 @@ CSS:层叠样式表 JSON-like
                         layerCenters.push(centers);
                     });
 
-                    if (model) {
-                        model.layers.forEach((layer, layerIndex) => {
-                            const fromNodes = layerCenters[layerIndex];
-                            const toNodes = layerCenters[layerIndex + 1];
-                            for (let row = 0; row < layer.weights.length; row++) {
-                                for (let col = 0; col < layer.weights[row].length; col++) {
-                                    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-                                    line.setAttribute('x1', fromNodes[col].x);
-                                    line.setAttribute('y1', fromNodes[col].y);
-                                    line.setAttribute('x2', toNodes[row].x);
-                                    line.setAttribute('y2', toNodes[row].y);
-                                    line.setAttribute('class', 'connection');
+                    layerCenters.slice(0, -1).forEach((fromNodes, layerIndex) => {
+                        const toNodes = layerCenters[layerIndex + 1];
+                        const layer = model && model.layers ? model.layers[layerIndex] : null;
+                        for (let row = 0; row < toNodes.length; row++) {
+                            for (let col = 0; col < fromNodes.length; col++) {
+                                const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                                line.setAttribute('x1', fromNodes[col].x);
+                                line.setAttribute('y1', fromNodes[col].y);
+                                line.setAttribute('x2', toNodes[row].x);
+                                line.setAttribute('y2', toNodes[row].y);
+                                line.setAttribute('class', 'connection');
+                                if (layer) {
                                     line.setAttribute('stroke', weightStrokeColor(layer.weights[row][col]));
                                     line.setAttribute('stroke-width', String(1.2 + Math.min(5, Math.abs(layer.weights[row][col]) * 3)));
-                                    networkSvg.appendChild(line);
+                                } else {
+                                    line.setAttribute('stroke', neutralStrokeColor());
+                                    line.setAttribute('stroke-width', '1.1');
                                 }
+                                networkSvg.appendChild(line);
                             }
-                        });
-                    }
+                        }
+                    });
 
                     layerCenters.forEach((centers, layerIndex) => {
                         centers.forEach((center) => {
@@ -843,7 +833,7 @@ CSS:层叠样式表 JSON-like
                         mode: '空闲',
                         epoch: 0,
                         loss: '-',
-                        status: '已清空',
+                        status: '已清空，保留网络连线',
                         action: '清空数据集'
                     });
                     drawDataset();
