@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 8.1.2">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"cx256-128.github.io","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="小注 本次是中国科学院大学计算机科学导论的结课个人作业，本次作业理论技术参考梯度下降与简单神经网络，灵感来自于  【基本操作】交互视频《一个人工智能的诞生》宣传片 - YouTube 神经网络平面分类可视化 - BiliBili">
+<meta property="og:type" content="article">
+<meta property="og:title" content="计算机科学导论--神经网络分类器说明">
+<meta property="og:url" content="http://cx256-128.github.io/2026/06/29/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%A7%91%E5%AD%A6%E5%AF%BC%E8%AE%BA-%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E5%88%86%E7%B1%BB%E5%99%A8%E8%AF%B4%E6%98%8E/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="小注 本次是中国科学院大学计算机科学导论的结课个人作业，本次作业理论技术参考梯度下降与简单神经网络，灵感来自于  【基本操作】交互视频《一个人工智能的诞生》宣传片 - YouTube 神经网络平面分类可视化 - BiliBili">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-06-29T06:26:59.000Z">
+<meta property="article:modified_time" content="2026-06-29T06:52:57.441Z">
+<meta property="article:author" content="Titaniam(CX256-128)">
+<meta property="article:tag" content="计科导作业">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://cx256-128.github.io/2026/06/29/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%A7%91%E5%AD%A6%E5%AF%BC%E8%AE%BA-%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E5%88%86%E7%B1%BB%E5%99%A8%E8%AF%B4%E6%98%8E/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>计算机科学导论--神经网络分类器说明 | Hexo</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<!-- hexo injector head_end start --><script> let HEXO_MMEDIA_DATA = { js: [], css: [], aplayerData: [], metingData: [], artPlayerData: [], dplayerData: []}; </script><!-- hexo injector head_end end --><style>mjx-container[jax="SVG"] {
+  direction: ltr;
+}
+
+mjx-container[jax="SVG"] > svg {
+  overflow: visible;
+}
+
+mjx-container[jax="SVG"][display="true"] {
+  display: block;
+  text-align: center;
+  margin: 1em 0;
+}
+
+mjx-container[jax="SVG"][justify="left"] {
+  text-align: left;
+}
+
+mjx-container[jax="SVG"][justify="right"] {
+  text-align: right;
+}
+
+g[data-mml-node="merror"] > g {
+  fill: red;
+  stroke: red;
+}
+
+g[data-mml-node="merror"] > rect[data-background] {
+  fill: yellow;
+  stroke: none;
+}
+
+g[data-mml-node="mtable"] > line[data-line] {
+  stroke-width: 70px;
+  fill: none;
+}
+
+g[data-mml-node="mtable"] > rect[data-frame] {
+  stroke-width: 70px;
+  fill: none;
+}
+
+g[data-mml-node="mtable"] > .mjx-dashed {
+  stroke-dasharray: 140;
+}
+
+g[data-mml-node="mtable"] > .mjx-dotted {
+  stroke-linecap: round;
+  stroke-dasharray: 0,140;
+}
+
+g[data-mml-node="mtable"] > svg {
+  overflow: visible;
+}
+
+[jax="SVG"] mjx-tool {
+  display: inline-block;
+  position: relative;
+  width: 0;
+  height: 0;
+}
+
+[jax="SVG"] mjx-tool > mjx-tip {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+mjx-tool > mjx-tip {
+  display: inline-block;
+  padding: .2em;
+  border: 1px solid #888;
+  font-size: 70%;
+  background-color: #F8F8F8;
+  color: black;
+  box-shadow: 2px 2px 5px #AAAAAA;
+}
+
+g[data-mml-node="maction"][data-toggle] {
+  cursor: pointer;
+}
+
+mjx-status {
+  display: block;
+  position: fixed;
+  left: 1em;
+  bottom: 1em;
+  min-width: 25%;
+  padding: .2em .4em;
+  border: 1px solid #888;
+  font-size: 90%;
+  background-color: #F8F8F8;
+  color: black;
+}
+
+foreignObject[data-mjx-xml] {
+  font-family: initial;
+  line-height: normal;
+  overflow: visible;
+}
+
+.MathJax path {
+  stroke-width: 3;
+}
+
+mjx-container[display="true"] {
+  overflow: auto hidden;
+}
+
+mjx-container[display="true"] + br {
+  display: none;
+}
+</style></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Hexo</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://cx256-128.github.io/2026/06/29/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%A7%91%E5%AD%A6%E5%AF%BC%E8%AE%BA-%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E5%88%86%E7%B1%BB%E5%99%A8%E8%AF%B4%E6%98%8E/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://avatars.githubusercontent.com/u/238252738">
+      <meta itemprop="name" content="Titaniam(CX256-128)">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          计算机科学导论--神经网络分类器说明
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2026-06-29 14:26:59 / 修改时间：14:52:57" itemprop="dateCreated datePublished" datetime="2026-06-29T14:26:59+08:00">2026-06-29</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="小注"><a class="markdownIt-Anchor" href="#小注"></a> 小注</h2>
+<p>本次是中国科学院大学计算机科学导论的结课个人作业，本次作业理论技术参考梯度下降与简单神经网络，灵感来自于</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://www.youtube.com/watch?v=J_YB5N8Ofcc">【基本操作】交互视频《一个人工智能的诞生》宣传片 - YouTube</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.bilibili.com/video/BV1XRFDzmE86/?pm_id_from=333.337.search-card.all.click&amp;vd_source=6078b2412b1d76a4be6843416f2a86a9">神经网络平面分类可视化 - BiliBili</a></li>
+</ul>
+<span id="more"></span>
+<h1 id="可交互的神经网络分类器的说明文件"><a class="markdownIt-Anchor" href="#可交互的神经网络分类器的说明文件"></a> 可交互的神经网络分类器的说明文件</h1>
+<blockquote>
+<p>计算机科学导论 · 个人网站作业<br>
+单文件 HTML 实现，在浏览器中直接运行</p>
+</blockquote>
+<hr>
+<h2 id="项目简介"><a class="markdownIt-Anchor" href="#项目简介"></a> 项目简介</h2>
+<p>这是一个<strong>可交互的神经网络分类器</strong>，专门帮助初学者直观理解"神经网络如何学会给数据分类"。你可以把它当成一个实验台：</p>
+<ul>
+<li><strong>左侧画布</strong>：代表一个二维平面，横轴和纵轴是两个输入特征（例如 x 和 y）。点击即可放置不同颜色的数据点（红、黄、蓝、绿），每个点代表一个样本及其类别。</li>
+<li><strong>右侧网络图</strong>：展示当前神经网络的连接结构。输入层有 2 个节点（接收坐标），输出层有 4 个节点（分别对应四种颜色），中间是你可以自由调整的<strong>隐藏层</strong>。</li>
+<li><strong>训练过程</strong>：网络会用 tanh 激活函数和 softmax 输出，反复计算预测与真实标签的差距（交叉熵损失），并通过梯度下降不断更新权重，让背景色块逐渐划分出各类别的"势力范围"。</li>
+<li><strong>动手实验</strong>：改变隐藏层的节点数或层数，再重新训练，观察网络结构如何影响分类能力。</li>
+</ul>
+<blockquote>
+<p>试试看：先画一些分堆的点，再点击"开始训练"，背景颜色会慢慢分开。你还可以随时停止、修改网络、再训练！</p>
+</blockquote>
+<hr>
+<h2 id="技术栈"><a class="markdownIt-Anchor" href="#技术栈"></a> 技术栈</h2>
+<ul>
+<li><strong>纯原生 JavaScript</strong>：无任何框架或外部库</li>
+<li><strong>Canvas API</strong>：数据点与决策边界的像素级渲染</li>
+<li><strong>SVG</strong>：神经网络结构图的可缩放绘制</li>
+<li><strong>CSS 变量系统</strong>：统一的现代化配色方案</li>
+</ul>
+<hr>
+<h2 id="功能概览"><a class="markdownIt-Anchor" href="#功能概览"></a> 功能概览</h2>
+<table>
+<thead>
+<tr>
+<th>模块</th>
+<th>功能</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>目标图（Canvas）</td>
+<td>点击添加四色数据点，训练时背景实时显示分类决策边界</td>
+</tr>
+<tr>
+<td>神经网络图（SVG）</td>
+<td>可视化网络层级结构，连线颜色/粗细编码权重值</td>
+</tr>
+<tr>
+<td>训练控制</td>
+<td>开始/停止训练，实时显示 loss、epoch、训练状态</td>
+</tr>
+<tr>
+<td>网络修改</td>
+<td>动态增删隐藏层节点/整层，点击图中节点快速选中</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="ai-辅助使用说明"><a class="markdownIt-Anchor" href="#ai-辅助使用说明"></a> AI 辅助使用说明</h2>
+<p>本项目的开发过程中，AI 工具在以下环节提供了辅助：</p>
+<h3 id="1-界面样式设计css"><a class="markdownIt-Anchor" href="#1-界面样式设计css"></a> 1. 界面样式设计（CSS）</h3>
+<p>通过 GitHub Copilot 辅助生成现代化的卡片式布局、配色方案（CSS 变量体系）以及响应式圆角/阴影细节。Copilot 根据类名语义自动补全了大量样式声明，显著提升了 UI 开发效率。</p>
+<h3 id="2-代码注释与文档"><a class="markdownIt-Anchor" href="#2-代码注释与文档"></a> 2. 代码注释与文档</h3>
+<p>部分函数的功能说明、参数注释由 AI 辅助生成，帮助理清代码逻辑。</p>
+<h3 id="3-调试辅助"><a class="markdownIt-Anchor" href="#3-调试辅助"></a> 3. 调试辅助</h3>
+<p>在实现反向传播时，AI 工具帮助解释了梯度计算中的维度对齐问题，以及 softmax 数值稳定性（减去最大值防止溢出）的原理。</p>
+<h3 id="4-优化建议"><a class="markdownIt-Anchor" href="#4-优化建议"></a> 4. 优化建议</h3>
+<p>代码中注释提到的"修改成使用 Adam 优化器"方向，即来自 AI 对训练收敛速度的分析建议，为后续改进提供了思路。</p>
+<blockquote>
+<p><strong>核心算法</strong>（前向传播、反向传播、梯度下降、tanh/softmax 的数学实现）均通过自主查阅教材与资料后手写完成，AI 仅用于辅助理解与效率提升，未直接生成核心逻辑代码。</p>
+</blockquote>
+<hr>
+<h2 id="创意点"><a class="markdownIt-Anchor" href="#创意点"></a> 创意点</h2>
+<h3 id="1-纯前端神经网络"><a class="markdownIt-Anchor" href="#1-纯前端神经网络"></a> 1. 纯前端神经网络</h3>
+<p>不依赖任何后端服务器或机器学习框架（如 TensorFlow/PyTorch），完全使用原生 JavaScript 从零实现多层感知机，包括前向传播、反向传播与梯度下降，打开浏览器即可运行。</p>
+<h3 id="2-决策边界实时可视化"><a class="markdownIt-Anchor" href="#2-决策边界实时可视化"></a> 2. 决策边界实时可视化</h3>
+<p>训练过程中以像素级粒度在画布背景上绘制每个类别的"势力范围"——通过遍历每个 14×14 像素格并进行预测着色，让抽象的数学分类边界变得直观可见。</p>
+<h3 id="3-权重颜色-粗细双编码"><a class="markdownIt-Anchor" href="#3-权重颜色-粗细双编码"></a> 3. 权重颜色-粗细双编码</h3>
+<p>网络连线同时使用<strong>颜色</strong>（<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mstyle mathcolor="blue"><mi mathvariant="normal">蓝</mi><mi mathvariant="normal">色</mi></mstyle></mrow><annotation encoding="application/x-tex">\textcolor{blue}{蓝色}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0em;vertical-align:0em;"></span><span class="mord cjk_fallback" style="color:blue;">蓝</span><span class="mord cjk_fallback" style="color:blue;">色</span></span></span></span> = 正权重，<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mstyle mathcolor="red"><mi mathvariant="normal">红</mi><mi mathvariant="normal">色</mi></mstyle></mrow><annotation encoding="application/x-tex">\textcolor{red}{红色}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0em;vertical-align:0em;"></span><span class="mord cjk_fallback" style="color:red;">红</span><span class="mord cjk_fallback" style="color:red;">色</span></span></span></span> = 负权重）和<strong>线宽</strong>（粗细反映权重绝对值大小）来编码连接强度，使网络"知识"一目了然。</p>
+<h3 id="4-可交互的网络结构编辑器"><a class="markdownIt-Anchor" href="#4-可交互的网络结构编辑器"></a> 4. 可交互的网络结构编辑器</h3>
+<p>用户可在训练前后自由增删隐藏层节点或整层，点击网络图中的节点/层标签即可选中并修改，即时观察结构变化对分类效果的影响——将神经网络从"黑盒"变为可动手实验的"教具"。</p>
+<h3 id="5-单文件零依赖架构"><a class="markdownIt-Anchor" href="#5-单文件零依赖架构"></a> 5. 单文件零依赖架构</h3>
+<p>HTML、CSS、JavaScript 全部整合在一个文件中，无需 npm、构建工具或任何外部库，拷贝到任何设备即可使用，极大降低了初学者的使用门槛。</p>
+<h3 id="6-异步训练-ui-实时刷新"><a class="markdownIt-Anchor" href="#6-异步训练-ui-实时刷新"></a> 6. 异步训练 + UI 实时刷新</h3>
+<p>使用 <code>requestAnimationFrame</code> 配合 <code>async/await</code> 实现训练循环与界面渲染的协作调度，每 50 轮更新一次画面，既保证了训练速度又维持了视觉流畅度。</p>
+<hr>
+<h2 id="开发过程中遇到的困难"><a class="markdownIt-Anchor" href="#开发过程中遇到的困难"></a> 开发过程中遇到的困难</h2>
+<h3 id="1-反向传播的链式求导实现"><a class="markdownIt-Anchor" href="#1-反向传播的链式求导实现"></a> 1. 反向传播的链式求导实现</h3>
+<p>最核心的困难在于手动推导多层网络的反向传播公式。需要逐层计算 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>δ</mi></mrow><annotation encoding="application/x-tex">\delta</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.69444em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.03785em;">δ</span></span></span></span>（误差信号）并正确传递到前一层的每个神经元，尤其是 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>tanh</mi><mo>⁡</mo></mrow><annotation encoding="application/x-tex">\tanh</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.69444em;vertical-align:0em;"></span><span class="mop">tanh</span></span></span></span> 激活函数的导数 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mn>1</mn><mo>−</mo><msup><mi>a</mi><mn>2</mn></msup></mrow><annotation encoding="application/x-tex">1 - a^2</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.72777em;vertical-align:-0.08333em;"></span><span class="mord">1</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.8141079999999999em;vertical-align:0em;"></span><span class="mord"><span class="mord mathdefault">a</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141079999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span></span></span></span> 要在正确的时机（激活值之后）使用。调试时经常出现梯度维度不匹配的问题。</p>
+<h3 id="2-训练循环与-ui-响应的平衡"><a class="markdownIt-Anchor" href="#2-训练循环与-ui-响应的平衡"></a> 2. 训练循环与 UI 响应的平衡</h3>
+<p>原始方案中训练循环会阻塞浏览器主线程，导致页面卡死无法点击"停止"按钮。通过将训练拆分为 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi mathvariant="normal">a</mi><mi mathvariant="normal">s</mi><mi mathvariant="normal">y</mi><mi mathvariant="normal">n</mi><mi mathvariant="normal">c</mi></mrow><annotation encoding="application/x-tex">\mathrm{async}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.625em;vertical-align:-0.19444em;"></span><span class="mord"><span class="mord mathrm">a</span><span class="mord mathrm">s</span><span class="mord mathrm" style="margin-right:0.01389em;">y</span><span class="mord mathrm">n</span><span class="mord mathrm">c</span></span></span></span></span> 函数，每 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>N</mi></mrow><annotation encoding="application/x-tex">N</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.10903em;">N</span></span></span></span> 轮用 <code>await requestAnimationFrame()</code> 让出控制权给浏览器，才实现了训练中的可中断交互。</p>
+<h3 id="3-画布坐标归一化"><a class="markdownIt-Anchor" href="#3-画布坐标归一化"></a> 3. 画布坐标归一化</h3>
+<p>数据点在画布上的像素坐标需要映射到神经网络输入的 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mo stretchy="false">[</mo><mo>−</mo><mn>1</mn><mo separator="true">,</mo><mn>1</mn><mo stretchy="false">]</mo></mrow><annotation encoding="application/x-tex">[-1, 1]</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">[</span><span class="mord">−</span><span class="mord">1</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord">1</span><span class="mclose">]</span></span></span></span> 区间。最初直接使用原始像素值导致 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>tanh</mi><mo>⁡</mo></mrow><annotation encoding="application/x-tex">\tanh</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.69444em;vertical-align:0em;"></span><span class="mop">tanh</span></span></span></span> 饱和区问题严重，后改为归一化到 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mo stretchy="false">[</mo><mo>−</mo><mn>1</mn><mo separator="true">,</mo><mn>1</mn><mo stretchy="false">]</mo></mrow><annotation encoding="application/x-tex">[-1, 1]</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">[</span><span class="mord">−</span><span class="mord">1</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord">1</span><span class="mclose">]</span></span></span></span> 后才使训练正常收敛。</p>
+<h3 id="4-softmax-数值稳定性"><a class="markdownIt-Anchor" href="#4-softmax-数值稳定性"></a> 4. Softmax 数值稳定性</h3>
+<p>直接对输出值取 <code>Math.exp()</code> 在数值较大时会溢出为 <code>Infinity</code>。查阅资料后采用"减去最大值"的稳定技巧 <code>Math.exp(value - max)</code>，既保持了相对大小关系又避免了溢出。</p>
+<h3 id="5-网络结构动态修改后的状态同步"><a class="markdownIt-Anchor" href="#5-网络结构动态修改后的状态同步"></a> 5. 网络结构动态修改后的状态同步</h3>
+<p>当用户在训练前后增删隐藏层节点或整层时，需要同步更新模型数据结构（<code>layerSizes</code>）、重新初始化权重、刷新 SVG 网络图、重绘 Canvas 背景，且不能丢失已有的数据点。这个过程涉及多个状态变量的协调，容易产生不一致。</p>
+<h3 id="6-权重可视化的视觉校准"><a class="markdownIt-Anchor" href="#6-权重可视化的视觉校准"></a> 6. 权重可视化的视觉校准</h3>
+<p>将权重数值映射到颜色透明度与线宽时，需要反复调整参数（透明度范围 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mn>0.18</mn><mo>−</mo><mn>0.85</mn></mrow><annotation encoding="application/x-tex">0.18-0.85</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.72777em;vertical-align:-0.08333em;"></span><span class="mord">0</span><span class="mord">.</span><span class="mord">1</span><span class="mord">8</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.64444em;vertical-align:0em;"></span><span class="mord">0</span><span class="mord">.</span><span class="mord">8</span><span class="mord">5</span></span></span></span>，线宽 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mn>1.2</mn><mo>−</mo><mn>6.2</mn></mrow><annotation encoding="application/x-tex">1.2-6.2</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.72777em;vertical-align:-0.08333em;"></span><span class="mord">1</span><span class="mord">.</span><span class="mord">2</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.64444em;vertical-align:0em;"></span><span class="mord">6</span><span class="mord">.</span><span class="mord">2</span></span></span></span>），使正负权重的视觉差异足够明显又不会过于刺眼。</p>
+<hr>
+<h2 id="参考引用"><a class="markdownIt-Anchor" href="#参考引用"></a> 参考引用</h2>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://www.bilibili.com/video/BV1XRFDzmE86/">神经网络平面分类可视化 (bilibili)</a></li>
+<li>【基本操作】交互视频《一个人工智能的诞生》宣传片 - YouTube（该项目内容已下架）</li>
+<li>【基本操作】《一个人工智能的诞生》（该项目内容已下架）</li>
+</ul>
+<hr>
+<h2 id="使用方法"><a class="markdownIt-Anchor" href="#使用方法"></a> 使用方法</h2>
+<ol>
+<li>直接用浏览器打开 <code>index.html</code></li>
+<li>在左侧画布点击放置不同颜色的数据点</li>
+<li>点击 <strong>“开始训练”</strong> 观察背景决策边界的变化</li>
+<li>在右侧通过按钮或点击网络图修改隐藏层结构</li>
+<li>点击 <strong>“刷新”</strong> 重新初始化网络，或继续训练观察结构变化的影响</li>
+</ol>
+<h2 id="引用"><a class="markdownIt-Anchor" href="#引用"></a> 引用</h2>
+<a href="/2026/06/07/%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E5%88%86%E7%B1%BB%E5%99%A8/" title="神经网络分类器">相关技术内容简单说明</a>  
+<p><a target="_blank" rel="noopener" href="https://cs101.ucas.ac.cn/site/chenxi256/index.html">作业</a></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E8%AE%A1%E7%A7%91%E5%AF%BC%E4%BD%9C%E4%B8%9A/" rel="tag"># 计科导作业</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2026/06/09/%E6%A0%88%E6%BA%A2%E5%87%BA1-%E7%AE%80%E5%8D%95Ret2shellcode/" rel="prev" title="栈溢出1:简单Ret2shellcode">
+      <i class="fa fa-chevron-left"></i> 栈溢出1:简单Ret2shellcode
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B0%8F%E6%B3%A8"><span class="nav-number">1.</span> <span class="nav-text"> 小注</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%8F%AF%E4%BA%A4%E4%BA%92%E7%9A%84%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E5%88%86%E7%B1%BB%E5%99%A8%E7%9A%84%E8%AF%B4%E6%98%8E%E6%96%87%E4%BB%B6"><span class="nav-number">2.</span> <span class="nav-text"> 可交互的神经网络分类器的说明文件</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%A1%B9%E7%9B%AE%E7%AE%80%E4%BB%8B"><span class="nav-number">2.1.</span> <span class="nav-text"> 项目简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8A%80%E6%9C%AF%E6%A0%88"><span class="nav-number">2.2.</span> <span class="nav-text"> 技术栈</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8A%9F%E8%83%BD%E6%A6%82%E8%A7%88"><span class="nav-number">2.3.</span> <span class="nav-text"> 功能概览</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ai-%E8%BE%85%E5%8A%A9%E4%BD%BF%E7%94%A8%E8%AF%B4%E6%98%8E"><span class="nav-number">2.4.</span> <span class="nav-text"> AI 辅助使用说明</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-%E7%95%8C%E9%9D%A2%E6%A0%B7%E5%BC%8F%E8%AE%BE%E8%AE%A1css"><span class="nav-number">2.4.1.</span> <span class="nav-text"> 1. 界面样式设计（CSS）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-%E4%BB%A3%E7%A0%81%E6%B3%A8%E9%87%8A%E4%B8%8E%E6%96%87%E6%A1%A3"><span class="nav-number">2.4.2.</span> <span class="nav-text"> 2. 代码注释与文档</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-%E8%B0%83%E8%AF%95%E8%BE%85%E5%8A%A9"><span class="nav-number">2.4.3.</span> <span class="nav-text"> 3. 调试辅助</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-%E4%BC%98%E5%8C%96%E5%BB%BA%E8%AE%AE"><span class="nav-number">2.4.4.</span> <span class="nav-text"> 4. 优化建议</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%9B%E6%84%8F%E7%82%B9"><span class="nav-number">2.5.</span> <span class="nav-text"> 创意点</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-%E7%BA%AF%E5%89%8D%E7%AB%AF%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C"><span class="nav-number">2.5.1.</span> <span class="nav-text"> 1. 纯前端神经网络</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-%E5%86%B3%E7%AD%96%E8%BE%B9%E7%95%8C%E5%AE%9E%E6%97%B6%E5%8F%AF%E8%A7%86%E5%8C%96"><span class="nav-number">2.5.2.</span> <span class="nav-text"> 2. 决策边界实时可视化</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-%E6%9D%83%E9%87%8D%E9%A2%9C%E8%89%B2-%E7%B2%97%E7%BB%86%E5%8F%8C%E7%BC%96%E7%A0%81"><span class="nav-number">2.5.3.</span> <span class="nav-text"> 3. 权重颜色-粗细双编码</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-%E5%8F%AF%E4%BA%A4%E4%BA%92%E7%9A%84%E7%BD%91%E7%BB%9C%E7%BB%93%E6%9E%84%E7%BC%96%E8%BE%91%E5%99%A8"><span class="nav-number">2.5.4.</span> <span class="nav-text"> 4. 可交互的网络结构编辑器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-%E5%8D%95%E6%96%87%E4%BB%B6%E9%9B%B6%E4%BE%9D%E8%B5%96%E6%9E%B6%E6%9E%84"><span class="nav-number">2.5.5.</span> <span class="nav-text"> 5. 单文件零依赖架构</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-%E5%BC%82%E6%AD%A5%E8%AE%AD%E7%BB%83-ui-%E5%AE%9E%E6%97%B6%E5%88%B7%E6%96%B0"><span class="nav-number">2.5.6.</span> <span class="nav-text"> 6. 异步训练 + UI 实时刷新</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BC%80%E5%8F%91%E8%BF%87%E7%A8%8B%E4%B8%AD%E9%81%87%E5%88%B0%E7%9A%84%E5%9B%B0%E9%9A%BE"><span class="nav-number">2.6.</span> <span class="nav-text"> 开发过程中遇到的困难</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-%E5%8F%8D%E5%90%91%E4%BC%A0%E6%92%AD%E7%9A%84%E9%93%BE%E5%BC%8F%E6%B1%82%E5%AF%BC%E5%AE%9E%E7%8E%B0"><span class="nav-number">2.6.1.</span> <span class="nav-text"> 1. 反向传播的链式求导实现</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-%E8%AE%AD%E7%BB%83%E5%BE%AA%E7%8E%AF%E4%B8%8E-ui-%E5%93%8D%E5%BA%94%E7%9A%84%E5%B9%B3%E8%A1%A1"><span class="nav-number">2.6.2.</span> <span class="nav-text"> 2. 训练循环与 UI 响应的平衡</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-%E7%94%BB%E5%B8%83%E5%9D%90%E6%A0%87%E5%BD%92%E4%B8%80%E5%8C%96"><span class="nav-number">2.6.3.</span> <span class="nav-text"> 3. 画布坐标归一化</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-softmax-%E6%95%B0%E5%80%BC%E7%A8%B3%E5%AE%9A%E6%80%A7"><span class="nav-number">2.6.4.</span> <span class="nav-text"> 4. Softmax 数值稳定性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-%E7%BD%91%E7%BB%9C%E7%BB%93%E6%9E%84%E5%8A%A8%E6%80%81%E4%BF%AE%E6%94%B9%E5%90%8E%E7%9A%84%E7%8A%B6%E6%80%81%E5%90%8C%E6%AD%A5"><span class="nav-number">2.6.5.</span> <span class="nav-text"> 5. 网络结构动态修改后的状态同步</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-%E6%9D%83%E9%87%8D%E5%8F%AF%E8%A7%86%E5%8C%96%E7%9A%84%E8%A7%86%E8%A7%89%E6%A0%A1%E5%87%86"><span class="nav-number">2.6.6.</span> <span class="nav-text"> 6. 权重可视化的视觉校准</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E5%BC%95%E7%94%A8"><span class="nav-number">2.7.</span> <span class="nav-text"> 参考引用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E6%96%B9%E6%B3%95"><span class="nav-number">2.8.</span> <span class="nav-text"> 使用方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BC%95%E7%94%A8"><span class="nav-number">2.9.</span> <span class="nav-text"> 引用</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Titaniam(CX256-128)"
+      src="https://avatars.githubusercontent.com/u/238252738">
+  <p class="site-author-name" itemprop="name">Titaniam(CX256-128)</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">4</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">分类</span>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/CX256-128" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;CX256-128" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:chenxi256@mails.ucas.ac.cn" title="Work-Mail → mailto:chenxi256@mails.ucas.ac.cn" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>Work-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:1636825621@qq.com" title="Personal-Mail → mailto:1636825621@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope-open fa-fw"></i>Personal-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="tencent://Message/?Uin=1636825621&websiteName=qzone.qq.com&WebsiteKey=1" title="QQ → tencent:&#x2F;&#x2F;Message&#x2F;?Uin&#x3D;1636825621&amp;websiteName&#x3D;qzone.qq.com&amp;WebsiteKey&#x3D;1" rel="noopener" target="_blank"><i class="fab fa-qq fa-fw"></i>QQ</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2026</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Titaniam(CX256-128)</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/katex@0/dist/katex.min.css">
+  <script src="//cdn.jsdelivr.net/npm/katex@0/dist/contrib/copy-tex.min.js"></script>
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/katex@0/dist/contrib/copy-tex.min.css">
+
+
+  
+
+<!-- hexo injector body_end start --><script src="/assets/mmedia/mmedia-loader.js"></script><!-- hexo injector body_end end --></body>
+</html>
